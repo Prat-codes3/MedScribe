@@ -12,7 +12,7 @@ It supports two main workflows:
 - `transcriber.py` wraps `faster-whisper` and applies Hinglish-friendly prompting.
 - `diarizer.py` wraps `pyannote.audio` for optional speaker labeling.
 - `live_scribe.py` listens to the microphone and transcribes in rolling windows.
-- `script.py` and `utils.py` are older prototypes kept for reference.
+- `proto.py` and `utils.py` are older prototypes kept for reference.
 
 ## Setup
 
