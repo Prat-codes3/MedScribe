@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.env
+*.wav
+*.mp4
+*_transcript.txt
+live_session_*.txt

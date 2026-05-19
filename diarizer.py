@@ -1,37 +1,49 @@
-from dotenv import load_dotenv
-load_dotenv()
-from pyannote.audio import Pipeline
-import torch
 import os
+import torch
+from dotenv import load_dotenv
+from pyannote.audio import Pipeline
+
+load_dotenv()
+
 
 class Diarizer:
-    def __init__(self):
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        token = os.getenv("HF_TOKEN")
-        
-        print(f"--- Loading Pyannote on {self.device} ---")
-        
-        # This will now use your token to download the model
+    def __init__(self, device=None, token=None):
+        requested_device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        if requested_device == "cuda" and not torch.cuda.is_available():
+            print("--- CUDA requested for diarization but not available; using CPU ---")
+            requested_device = "cpu"
+
+        self.device = torch.device(requested_device)
+        token = token or os.getenv("HF_TOKEN")
+
+        if not token:
+            raise ValueError(
+                "HF_TOKEN not found in .env file. Run without diarization or add a token."
+            )
+
+        print(f"--- Loading Pyannote Diarization on {self.device} ---")
+
+        # Load the gated model from HuggingFace
         self.pipeline = Pipeline.from_pretrained(
             "pyannote/speaker-diarization-3.1",
             use_auth_token=token
         )
-        
-        if self.pipeline is None:
-            raise ValueError("Pipeline failed to load. Check your HF_TOKEN and permissions.")
-            
-        self.pipeline.to(self.device)
 
-    def diarize(self, audio_path):
-        """Returns a list of speaker segments."""
-        print("Running diarization... This may take a moment.")
+        if self.pipeline:
+            self.pipeline.to(self.device)
+        else:
+            raise Exception("Failed to initialize Pyannote pipeline.")
+
+    def apply(self, audio_path):
+        print("--- Analyzing Speaker Timestamps... ---")
         diarization = self.pipeline(audio_path)
         
-        speakers = []
+        speaker_segments = []
         for turn, _, speaker in diarization.itertracks(yield_label=True):
-            speakers.append({
+            speaker_segments.append({
                 "start": turn.start,
                 "end": turn.end,
                 "speaker": speaker
             })
-        return speakers
+        speaker_segments.sort(key=lambda item: (item["start"], item["end"]))
+        return speaker_segments

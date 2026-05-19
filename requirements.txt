@@ -1,0 +1,7 @@
+faster-whisper
+numpy
+pyannote.audio
+python-dotenv
+scipy
+sounddevice
+torch
