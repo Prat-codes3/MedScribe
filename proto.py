@@ -16,13 +16,13 @@ model = whisper.load_model("base")  # or "small"
 samplerate = 16000
 q = queue.Queue()
 
-# 🎤 Callback for continuous audio
+#  Callback for continuous audio
 def audio_callback(indata, frames, time, status):
     q.put(indata.copy())
 
-# 🎤 Continuous Live Transcription
+# Continuous Live Transcription
 def live_transcription():
-    print("🎤 Continuous Listening... (Press Ctrl+C to stop)\n")
+    print(" Continuous Listening... (Press Ctrl+C to stop)\n")
 
     with sd.InputStream(samplerate=samplerate,
                         channels=1,
@@ -45,36 +45,36 @@ def live_transcription():
 
                     result = model.transcribe(
                         filename,
-                        language="hi"   # 🔥 Hinglish trick
+                        language="hi"   #  Hinglish trick
                     )
 
-                    print("📝", result["text"])
+                    print(" ", result["text"])
 
                     os.remove(filename)
                     audio_buffer = []
 
             except KeyboardInterrupt:
-                print("\n🛑 Stopped listening.")
+                print("\n Stopped listening.")
                 break
 
 
-# 📁 File Transcription
+#  File Transcription
 def transcribe_file(filepath):
     if not os.path.exists(filepath):
-        print("❌ File not found!")
+        print(" File not found!")
         return
 
-    print(f"🧠 Transcribing file: {filepath}")
+    print(f" Transcribing file: {filepath}")
 
     result = model.transcribe(
         filepath,
         language="hi"   # Hinglish support
     )
 
-    print("📝 Result:", result["text"])
+    print(" Result:", result["text"])
 
 
-# 🎯 Main
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
@@ -91,9 +91,9 @@ if __name__ == "__main__":
 
     elif args.mode == "file":
         if args.file is None:
-            print("❌ Provide file path using --file")
+            print(" Provide file path using --file")
         else:
             transcribe_file(args.file)
 
     else:
-        print("❌ Invalid mode! Use 'live' or 'file'")
+        print("Invalid mode! Use 'live' or 'file'")
